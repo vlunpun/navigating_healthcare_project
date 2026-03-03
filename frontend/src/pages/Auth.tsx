@@ -14,7 +14,7 @@ export default function Auth() {
   const handleContinue = () => {
     setIsLoading(true);
     setTimeout(() => {
-      navigate("/loading");
+      navigate("/consent");
     }, 500);
   };
 
