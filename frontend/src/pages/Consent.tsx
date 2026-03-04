@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ShieldCheck, Lock, FileText, Mail, Phone } from "lucide-react";
 
 export default function Consent() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const phone = (location.state as any)?.phone || "";
   const [agreed, setAgreed] = useState(false);
 
   return (
@@ -153,7 +155,7 @@ export default function Consent() {
             </label>
 
             <Button
-              onClick={() => navigate("/loading")}
+              onClick={() => navigate("/loading", { state: { phone } })}
               disabled={!agreed}
               className="w-full h-11 text-base"
             >

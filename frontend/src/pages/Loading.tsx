@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ShieldCheck, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { inferWithGuidance } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,17 @@ type Step = "identity" | "network" | "records" | "analyzing";
 
 export default function Loading() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const phone = (location.state as any)?.phone || "";
   const [step, setStep] = useState<Step>("identity");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+
+    // Normalize phone to digits only for comparison
+    const digits = phone.replace(/\D/g, "");
+    const isAuthorized = digits === "4107072690" || digits === "14107072690";
 
     async function run() {
       // animate steps, then call API
@@ -23,6 +29,12 @@ export default function Loading() {
       await delay(600);
       if (cancelled) return;
       setStep("records");
+
+      if (!isAuthorized) {
+        if (cancelled) return;
+        setError("No medical records found for this phone number. Please verify your information and try again.");
+        return;
+      }
 
       await delay(600);
       if (cancelled) return;
@@ -42,7 +54,7 @@ export default function Loading() {
     return () => {
       cancelled = true;
     };
-  }, [navigate]);
+  }, [navigate, phone]);
 
   const done = (s: Step) => {
     const order: Step[] = ["identity", "network", "records", "analyzing"];
